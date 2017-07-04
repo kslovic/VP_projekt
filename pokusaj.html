@@ -1,0 +1,45 @@
+<html>
+<head>
+  <title>d3.svg.ribbon Example</title>
+  <meta charset="utf-8" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.16/d3.min.js" charset="utf-8" type="text/javascript"></script>
+<script src="d3.svg.ribbon.js" type="text/JavaScript"></script>
+</head>
+<style>
+  svg {
+    height: 1000px;
+    width: 1000px;
+  }
+
+</style>
+<body>
+
+<div id="viz">
+  <svg>
+  </svg>
+</div>
+</body>
+  <footer>
+
+<script>
+
+var points = [{x: 100, y:200, t: 200},{x:400,y:100, t: 20}];
+
+ribbon = d3.svg.ribbon()
+  .x(function(d) {return d.x})
+  .y(function(d) {return d.y})
+  .r(function(d) {return d.t});
+
+d3.select("svg")
+.append("path")
+.style("fill", "lightblue")
+.style("stroke", "blue")
+.style("stroke-opacity", 0.75)
+.style("stroke-width", "2px")
+.attr("d", ribbon(points))
+
+
+</script>
+  </footer>
+
+</html>

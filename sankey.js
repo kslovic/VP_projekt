@@ -1,6 +1,6 @@
 d3.sankey = function() {
   var sankey = {},
-      nodeWidth = 24,
+      nodeWidth = 30,
       nodePadding = 1,
       size = [1, 1],
       nodes = [],
@@ -54,19 +54,40 @@ d3.sankey = function() {
     var curvature = 0.5;
 
     function link(d) {
+      if(d.kind=="links"){
       var x0 = d.source.x + d.source.dx,
           x1 = d.target.x/4,
           xi = d3.interpolateNumber(x0, x1),
           x2 = xi(curvature),
           x3 = xi(1 - curvature),
-          y0 = d.source.y + d.sy + d.dy / 2,
-          y1 = d.target.y + d.ty + d.dy / 2;
+          y0 = d.source.y + d.sy / 2,
+          y1 = d.target.y + d.ty / 2;
       return "M" + y0 + "," + x0
            + "C" + y0 + "," + x2
            + " " + y1 + "," + x3
-           + " " + y1 + "," + x1;
-    }
-
+           + " " + y1 + "," + x1
+           + "L" + (y1+d.target.dy) + "," + x1
+           + "C" + (y0+d.dy) + "," + x2
+           + " " + (y0+d.dy) + "," + x2
+           + " " + (y0+d.dy) + "," + x0;}
+  else{
+    var x0 = d.target.x,
+          x1 = d.source.x/4+ d.source.dx,
+          xi = d3.interpolateNumber(x0, x1),
+          x2 = xi(curvature),
+          x3 = xi(1 - curvature),
+          y0 = d.target.y + d.sy/1000,
+          y1 = d.source.y + d.ty;
+      return "M" + y0 + "," + x0/4
+           + "C" + y0 + "," + x2/4
+           + " " + y1 + "," + x3/4
+           + " " + y1 + "," + x1
+           + "L" + (y1+d.source.dy) + "," + x1
+           + "C" + (y0+d.dy)/2 + "," + x2/4
+           + " " + (y0) + "," + x3/4
+           + " " + (y0+d.dy) + "," + x0/4;
+  }  
+  }
     link.curvature = function(_) {
       if (!arguments.length) return curvature;
       curvature = +_;
@@ -96,19 +117,7 @@ d3.sankey = function() {
   // Compute the value (size) of each node by summing the associated links.
   function computeNodeValues() {
     nodes.forEach(function(node) {
-		node.realvalue = Math.max(
-        d3.sum(node.sourceLinks, value),
-        d3.sum(node.targetLinks, value)
-		);
-		if(node.node>21&&Math.max(
-        d3.sum(node.sourceLinks, value),
-        d3.sum(node.targetLinks, value)
-		)!=0){node.value=10000;}
-		else{
-		 node.value = Math.max(
-        d3.sum(node.sourceLinks, value),
-        d3.sum(node.targetLinks, value)
-		);}
+		if(node.kind=="target"&&node.value!=0){node.value=10000;}
     });
   }
 
@@ -172,7 +181,7 @@ d3.sankey = function() {
     initializeNodeDepth();
     resolveCollisions();
     for (var alpha = 1; iterations > 0; --iterations) {
-      relaxRightToLeft(alpha *= .99);
+     
       resolveCollisions();
       relaxLeftToRight(alpha);
       resolveCollisions();
@@ -234,7 +243,7 @@ d3.sankey = function() {
             i;
 
         // Push any overlapping nodes down.
-        nodes.sort(ascendingDepth);
+       // nodes.sort(ascendingDepth);
         for (i = 0; i < n; ++i) {
           node = nodes[i];
           dy = y0 - node.y;
