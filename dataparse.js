@@ -13,7 +13,7 @@ var datacol=[
 ,{"type": "numeric", "name": "Bademi", "values": [2357,2146,2175,1297,1091,777,568,536,651,1493,143,143,1582,74,69,54]}
 ,{"type": "numeric", "name": "Smokve", "values": [4084,3870,3695,3335,3459,1108,914,1093,1388,1221,908,1287,1266,908,725,699]}
 ,{"type": "numeric", "name": "Jagode", "values": [1085,1114,1331,1357,1520,2156,2553,1171,1342,1463,1776,1962,1281,3914,3167,2367]}
-,{"type": "numeric", "name": "Bobičasto voće bez jagoda", "values": [0,0,0,0,0,0,0,0,0,855,817,1193,324,975,478,1756]}
+,{"type": "numeric", "name": "Bobičasto voće", "values": [0,0,0,0,0,0,0,0,0,855,817,1193,324,975,478,1756]}
 ,{"type": "numeric", "name": "Naranče", "values": [497,583,503,463,332,574,556,531,416,524,202,315,269,145,106,158]}
 ,{"type": "numeric", "name": "Mandarinke", "values": [18995,17656,15757,10449,14470,7576,41201,41655,48297,35907,55000,41870,50786,40024,64378,35722]}
 ,{"type": "numeric", "name": "Limuni", "values": [403,502,472,438,397,213,218,459,247,236,138,200,195,240,181,183]}
@@ -53,6 +53,7 @@ for(i=0;i<19;i++){
 	jsonData["node"] = 19+i;
 	jsonData["kind"] = "target";
 	jsonData["value"] = value;
+	jsonData["realvalue"] = value;
 	jsonData["slika"] = fruit.substring(0,3);
 	nodes2.push(jsonData);
 }
@@ -105,6 +106,8 @@ for(i=0;i<19;i++){
 	jsonData["node"] = 19+i;
 	jsonData["kind"] = "target";
 	jsonData["value"] = value;
+	jsonData["realvalue"] = value;
+	jsonData["slika"] = fruit.substring(0,3);
 	nodes2.push(jsonData);
 }
 data.nodes=nodes1.concat(nodes2);

@@ -172,9 +172,9 @@ var graph=data;
         }
     });
     var g;
-  node.on("mouseover", function(d){ if(d.kind=="target"){
+  node.on("mouseover", function(d){ if(d.kind=="target"&&show==false){
     g=svg.select("g[id='"+ d.node +"']").append("g")
-    .attr("transform", "translate("+ -130 +", "+ 50 +")")
+    .attr("transform", "translate("+ -70 +", "+ -150 +")")
     .style("opacity",1);
     var hover=g.append("rect")
     .attr("width", 175)
@@ -183,7 +183,7 @@ var graph=data;
     .style("stroke", "black");
     g.append("text")
     .attr("text-anchor", "middle")
-    .attr("transform", "translate("+ 40 +", "+ 10 +")")
+    .attr("transform", "translate("+ 80 +", "+ 10 +")")
     .attr("dy", ".40em")
     .style("font-weight", "bold")
     .text(d.name);
@@ -191,15 +191,15 @@ var graph=data;
     .attr("text-anchor", "middle")
     .attr("transform", "translate("+ 80 +", "+ 25 +")")
     .attr("dy", ".35em")
-    .text("Količina : "+ d.value + " " +units);
+    .text("Količina : "+ d.realvalue + " " +units);
     g.append("svg:image")
     .attr('width', 100)
             .attr('height', 90)
-            .attr("xlink:href", "static/"+ d.name.substring(0,3) +".jpg")
+            .attr("xlink:href", "static/"+ d.slika +".jpg")
             .attr("transform", "translate("+ 40 +", "+ 35 +")");
   }
             });
-            node.on("mouseout", function(d){ if(d.kind=="target"){g.remove();} }); 
+            node.on("mouseout", function(d){ if(d.kind=="target"&&show==false){g.remove();} }); 
     /*
     var g=container.append("g")
     .attr("transform", "translate("+ 1000 +", "+ 1000 +")")
