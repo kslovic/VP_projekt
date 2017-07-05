@@ -19,7 +19,7 @@ var datacol=[
 ,{"type": "numeric", "name": "Limuni", "values": [403,502,472,438,397,213,218,459,247,236,138,200,195,240,181,183]}
 ,{"type": "numeric", "name": "Grožđe", "values": [182436,186175,188749,183451,174536,181021,179426,197979,185256,206437,207743,204373,187550,181096,134941,154227]}
 ,{"type": "numeric", "name": "Masline", "values": [16215,19413,32955,9482,20613,36602,27530,34527,35955,32592,38001,31423,50945,34269,8840,28267]}
-,{"type": "numeric", "name": "Svježe voće (okućnica)", "values": [50943,41167,38121,44320,67813,51945,68773,82813,79360,71777,60756,45923,23698,26763,15105,16074]}
+,{"type": "numeric", "name": "Okućnica", "values": [50943,41167,38121,44320,67813,51945,68773,82813,79360,71777,60756,45923,23698,26763,15105,16074]}
 ];
 var data = { 
     nodes : [],
@@ -53,6 +53,7 @@ for(i=0;i<19;i++){
 	jsonData["node"] = 19+i;
 	jsonData["kind"] = "target";
 	jsonData["value"] = value;
+	jsonData["slika"] = fruit.substring(0,3);
 	nodes2.push(jsonData);
 }
 data.nodes=nodes1.concat(nodes2);
@@ -133,7 +134,7 @@ for(i=0;i<16;i++){
 	var fruit=datacol[k]["name"];
 	var value=datacol[k]["values"][i];
 	jsonData["year"] = year;
-	jsonData["name"] = fruit+"-"+year;
+	jsonData["name"] = fruit+" - "+year;
 	jsonData["node"] = 38+i;
 	jsonData["kind"] = "yearext";
 	jsonData["value"] = value;

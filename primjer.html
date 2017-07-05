@@ -22,7 +22,7 @@
 
 .link:hover {
   stroke-opacity: .2;
-  fill-opacity: .3;
+  fill-opacity: .8;
 }
     .wrapper {
       width: 800px;
@@ -32,8 +32,14 @@
     .wrapper > div {
       margin: 35px 0;
     }
+    h2{
+      margin-left: 30%;
+      text-shadow: -1px 0 darkgray, 0 1px darkgray, 1px 0 darkgray, 0 -1px darkgray;
+      font-family: "Comic Sans MS";
+    }
 </style>
 <body>
+<h2>Proizvodnja voća, grožđa i maslina u tonama</h2>
 <div class="wrapper">
     <div id="slider4"></div>
   </div>
@@ -44,30 +50,33 @@
 <script src="d3.slider.js"></script>
 
 <script>
+var showed;
 var show=false;
 var value=2000;
 d3.select('#slider4').call(d3.slider().axis(true).min(2000).max(2015).step(2).on("slide", function(evt, value) {
       update(value);
 	 
     }));
-var units = "Tona";
+var units = "tona";
 
 var margin = {top: 10, right: 10, bottom: 10, left: 0},
     width = 1600 - margin.left - margin.right,
-    height = 1300 - margin.top - margin.bottom;
+    height = 1200 - margin.top - margin.bottom;
 
 var formatNumber = d3.format(",.0f"),    // zero decimal places
     format = function(d) { return formatNumber(d) + " " + units; },
     color = d3.scale.category20();
-
 // append the svg canvas to the page
 var svg = d3.select("#chart").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
-  .append("g")
-    .attr("transform", 
-          "translate(" + margin.left + "," + margin.top + ")");
-
+   .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    var container = svg.append("g");
+    var rect = svg.append("rect")
+    .attr("width", width)
+    .attr("height", height)
+    .style("fill", "none");
 // Set the sankey diagram properties
 var sankey = d3.sankey()
     .nodeWidth(36)
@@ -79,6 +88,8 @@ var path = sankey.link();
 data=setData();
 createView(data);
 function update(updatedata){
+  show=false;
+         deleteYearExt();
 var ugraph=updateYear(updatedata);
 removesankey();
 createView(ugraph);
@@ -92,11 +103,11 @@ var graph=data;
 
 // add in the links
 
-  var link = svg.append("g").selectAll(".link")
+  var link = container.append("g").selectAll(".link")
       .data(graph.links)
     .enter().append("path")
       .attr("class", "link")
-      .attr("d", path)
+      .attr("d",  path)
       .style("stroke-width", function(d) { return 1; })
 	  .style("fill", function(d) { 
 		  return d.color = color(d.source.name.replace(/ .*/, "")); })
@@ -108,12 +119,14 @@ var graph=data;
         .text(function(d) {
     		return d.source.name +" : " + format(d.value); });
 // add in the nodes
-  var node = svg.append("g").selectAll(".node")
+  var node = container.append("g").selectAll(".node")
       .data(graph.nodes)
     .enter().append("g")
       .attr("class", "node")
-      .attr("transform", function(d) { 
-		  return "translate(" + d.y + "," + d.x/4 + ")"; });
+      .attr("id", function(d) { 
+		  return d.node; })
+      .attr("transform", function(d) { if(d.value!=0){
+		  return "translate(" + d.y + "," + d.x/4 + ")"; }});
 
 // add the rectangles for the nodes
   node.append("rect")
@@ -127,47 +140,103 @@ var graph=data;
       .text(function(d) { 
 		  if(d.kind=="source") return  d.name + "\n" + format(d.value);
       else  return  d.name;  });
-
 // add in the title for the nodes
   node.append("text")
-      .attr("x", -6)
-      .attr("y", function(d) { return d.dy; })
+      .attr("text-anchor", "middle")
       .attr("dy", ".35em")
-      .attr("transform", "rotate(" + 40 +"),translate("+ 30 +"," + 20 +")")
-      .text(function(d) { if(d.kind=="target"&&d.value!=0) return d.name; })
+      .attr("transform", "rotate(" + 60 +"),translate("+ 110 +"," + 25 +")")
+      .style("font-family","Comic Sans MS")
+      .text(function(d) { if(show==false&&d.kind=="target"&&d.value!=0) return d.name; else if(d.kind=="yearext"&&d.value!=0) return d.name; else return ""; })
     .filter(function(d) { return d.x < width / 2; })
       .attr("x", sankey.nodeWidth());
       node.on("click",function(d){
+        if(d.kind=="target"){
         if(show==false){
+        show=true;
+        showed=d.node;
         var data1=updateByFruit(d.node);
         removesankey();
         createView(data1);
-        show=true;
       }
       else{
+        show=false;
          deleteYearExt();
-         show=false;
+         if(showed!=d.node){
+            show=true;
+            showed=d.node;
+            var data1=updateByFruit(d.node);
+            removesankey();
+            createView(data1);
       }
-      });
+      }
+        }
+    });
+    var g;
+  node.on("mouseover", function(d){ if(d.kind=="target"){
+    g=svg.select("g[id='"+ d.node +"']").append("g")
+    .attr("transform", "translate("+ -130 +", "+ 50 +")")
+    .style("opacity",1);
+    var hover=g.append("rect")
+    .attr("width", 175)
+    .attr("height", 125)
+    .style("fill", "white")
+    .style("stroke", "black");
+    g.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ 40 +", "+ 10 +")")
+    .attr("dy", ".40em")
+    .style("font-weight", "bold")
+    .text(d.name);
+    g.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ 80 +", "+ 25 +")")
+    .attr("dy", ".35em")
+    .text("Količina : "+ d.value + " " +units);
+    g.append("svg:image")
+    .attr('width', 100)
+            .attr('height', 90)
+            .attr("xlink:href", "static/"+ d.name.substring(0,3) +".jpg")
+            .attr("transform", "translate("+ 40 +", "+ 35 +")");
+  }
+            });
+            node.on("mouseout", function(d){ if(d.kind=="target"){g.remove();} }); 
+    /*
+    var g=container.append("g")
+    .attr("transform", "translate("+ 1000 +", "+ 1000 +")")
+    .style("opacity",0);
+    var hover=g.append("rect")
+    .attr("width", 175)
+    .attr("height", 125)
+    .style("fill", "white")
+    .style("stroke", "black");
+    g.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ 40 +", "+ 10 +")")
+    .attr("dy", ".35em")
+    .text("kiki");
+    g.append("text")
+    .attr("text-anchor", "middle")
+    .attr("transform", "translate("+ 40 +", "+ 25 +")")
+    .attr("dy", ".35em")
+    .text("Količina:");
+    g.append("svg:image")
+    .attr('width', 100)
+            .attr('height', 100)
+            .attr("xlink:href", "static/Sljive.jpg")
+            .attr("transform", "translate("+ 40 +", "+ 30 +")");
+  */
+
+
 } 
 // the function for moving the nodes
-  function dragmove(d) {
-    d3.select(this).attr("transform", 
-        "translate(" + (
-                d.y = Math.max(0, Math.min(width - d.dy, d3.event.y))
-            ) + "," + d.x + ")");
-    sankey.relayout();
-    link.attr("d", path);
-	
-  }
 function removesankey(){
          var data = { 
           nodes : [],
 	        links : []
         };
-  var node = svg.selectAll(".node")
+  var node = container.selectAll(".node")
   .data(data);
-  var link = svg.selectAll(".link")
+  var link = container.selectAll(".link")
   .data(data);
   node.exit().remove();
   link.exit().remove();
@@ -177,6 +246,8 @@ function deleteYearExt(){
   data=updateYear(value);
   createView(data);
 }
+
+
 </script>
 </script>
 </body>

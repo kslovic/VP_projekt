@@ -54,6 +54,7 @@ d3.sankey = function() {
     var curvature = 0.5;
 
     function link(d) {
+      if(d.value!=0){
       if(d.kind=="links"){
       var x0 = d.source.x + d.source.dx,
           x1 = d.target.x/4,
@@ -67,7 +68,7 @@ d3.sankey = function() {
            + " " + y1 + "," + x3
            + " " + y1 + "," + x1
            + "L" + (y1+d.target.dy) + "," + x1
-           + "C" + (y0+d.dy) + "," + x2
+           + "C" + (y1) + "," + x2
            + " " + (y0+d.dy) + "," + x2
            + " " + (y0+d.dy) + "," + x0;}
   else{
@@ -83,10 +84,14 @@ d3.sankey = function() {
            + " " + y1 + "," + x3/4
            + " " + y1 + "," + x1
            + "L" + (y1+d.source.dy) + "," + x1
-           + "C" + (y0+d.dy)/2 + "," + x2/4
-           + " " + (y0) + "," + x3/4
+           + "C" + (y1) + "," + x2/4
+           + " " + (y0+d.dy) + "," + x3/4
            + " " + (y0+d.dy) + "," + x0/4;
   }  
+      }
+      else{
+        return "M" + 0 + "," + 0;
+      }
   }
     link.curvature = function(_) {
       if (!arguments.length) return curvature;
@@ -193,14 +198,32 @@ d3.sankey = function() {
       });
 
       nodesByBreadth.forEach(function(nodes) {
+        var maxvalue = d3.max(nodes, function(d) { if(d.kind=="yearext") return d.value; else return 0; });
         nodes.forEach(function(node, i) {
           node.y = i;
           node.dy = node.value * ky;
+          var amp;
+          if(node.kind=="yearext"&&maxvalue<10000){
+            amp=0.008;
+             if(maxvalue<5000)
+            amp=0.017;
+             if(maxvalue<1000)
+            amp=0.10001;
+          node.dy = node.value * amp;
+          }
         });
       });
-
+       var maxvalue = d3.max(links, function(d) { if(d.kind=="yearext") return d.value; else return 0; });
       links.forEach(function(link) {
         link.dy = link.value * ky;
+         if(link.kind=="yearext"&&maxvalue<10000){
+            amp=0.008;
+             if(maxvalue<5000)
+            amp=0.017;
+             if(maxvalue<1000)
+            amp=0.10001;
+          link.dy = link.value * amp;
+          }
       });
     }
 
