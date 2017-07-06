@@ -53,9 +53,10 @@
 var showed;
 var show=false;
 var value=2000;
-d3.select('#slider4').call(d3.slider().axis(true).min(2000).max(2015).step(2).on("slide", function(evt, value) {
+//slider:http://thematicmapping.org/playground/d3/d3.slider/
+//on drag update by year
+d3.select('#slider4').call(d3.slider().axis(true).min(2000).max(2015).step(1).on("slide", function(evt, value) {
       update(value);
-	 
     }));
 var units = "tona";
 
@@ -86,14 +87,18 @@ var sankey = d3.sankey()
 var path = sankey.link();
 // load the data
 data=setData();
+//create beggining view
 createView(data);
+//update view by year-parametar
 function update(updatedata){
+  value=updatedata;
   show=false;
-         deleteYearExt();
+deleteYearExt();
 var ugraph=updateYear(updatedata);
 removesankey();
 createView(ugraph);
 		}
+//create new view
 function createView(data){
 var graph=data;
   sankey
@@ -102,7 +107,6 @@ var graph=data;
       .layout(40);
 
 // add in the links
-
   var link = container.append("g").selectAll(".link")
       .data(graph.links)
     .enter().append("path")
@@ -138,17 +142,18 @@ var graph=data;
 		  return d3.rgb(d.color).darker(2); })
     .append("title")
       .text(function(d) { 
-		  if(d.kind=="source") return  d.name + "\n" + format(d.value);
-      else  return  d.name;  });
+		  if(d.kind=="target") return  d.name;
+      else  return  d.name+ "\n" + format(d.value);  });
 // add in the title for the nodes
   node.append("text")
-      .attr("text-anchor", "middle")
+      .attr("text-anchor", "start")
       .attr("dy", ".35em")
-      .attr("transform", "rotate(" + 60 +"),translate("+ 110 +"," + 25 +")")
+      .attr("transform", function(d){ if(d.kind=="target") return "rotate(" + 60 +"),translate("+ 30 +"," + 25 +")"; else return "rotate(" + 60 +"),translate("+ 45 +"," + 5 +")";})
       .style("font-family","Comic Sans MS")
-      .text(function(d) { if(show==false&&d.kind=="target"&&d.value!=0) return d.name; else if(d.kind=="yearext"&&d.value!=0) return d.name; else return ""; })
+      .text(function(d) { if(show==false&&d.kind=="target"&&d.value!=0) return d.name; else if(d.kind=="yearext"&&d.value!=0) return d.year; else return ""; })
     .filter(function(d) { return d.x < width / 2; })
       .attr("x", sankey.nodeWidth());
+//on click update by product
       node.on("click",function(d){
         if(d.kind=="target"){
         if(show==false){
@@ -172,6 +177,7 @@ var graph=data;
         }
     });
     var g;
+//on mouseover show picture value and title
   node.on("mouseover", function(d){ if(d.kind=="target"&&show==false){
     g=svg.select("g[id='"+ d.node +"']").append("g")
     .attr("transform", "translate("+ -70 +", "+ -150 +")")
@@ -200,35 +206,8 @@ var graph=data;
   }
             });
             node.on("mouseout", function(d){ if(d.kind=="target"&&show==false){g.remove();} }); 
-    /*
-    var g=container.append("g")
-    .attr("transform", "translate("+ 1000 +", "+ 1000 +")")
-    .style("opacity",0);
-    var hover=g.append("rect")
-    .attr("width", 175)
-    .attr("height", 125)
-    .style("fill", "white")
-    .style("stroke", "black");
-    g.append("text")
-    .attr("text-anchor", "middle")
-    .attr("transform", "translate("+ 40 +", "+ 10 +")")
-    .attr("dy", ".35em")
-    .text("kiki");
-    g.append("text")
-    .attr("text-anchor", "middle")
-    .attr("transform", "translate("+ 40 +", "+ 25 +")")
-    .attr("dy", ".35em")
-    .text("Količina:");
-    g.append("svg:image")
-    .attr('width', 100)
-            .attr('height', 100)
-            .attr("xlink:href", "static/Sljive.jpg")
-            .attr("transform", "translate("+ 40 +", "+ 30 +")");
-  */
-
-
 } 
-// the function for moving the nodes
+// empty data and delete nodes and links
 function removesankey(){
          var data = { 
           nodes : [],
@@ -240,7 +219,8 @@ function removesankey(){
   .data(data);
   node.exit().remove();
   link.exit().remove();
-  }
+}
+//remove values by year - remove old view with years and create new view of current year
 function deleteYearExt(){
   removesankey();
   data=updateYear(value);

@@ -2,7 +2,7 @@
     position: relative;
     font-family: Verdana,Arial,sans-serif;
     font-size: 1.1em;
-    border: 1px solid #aaaaaa;
+    border: 2px solid #aaaaaa;
     z-index: 2;
 }
 
@@ -36,9 +36,8 @@
     width: 1.2em;
     height: 1.2em;
     border: 1px solid #d3d3d3;
-    border-radius: 4px;
-    background: #eee;
-    background: linear-gradient(to bottom, #eee 0%, #ddd 100%);
+    border-radius: 10px;
+    background: black;
     z-index: 3;
 }
 

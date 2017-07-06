@@ -1,4 +1,4 @@
-
+//original JSON object
 var datacol=[
 {"type": "numeric", "name": "Godine", "values": [  2000,  2001,  2002,  2003,  2004,  2005,  2006,  2007,  2008,  2009,  2010,  2011,  2012,  2013,  2014,  2015]}
 ,{"type": "numeric", "name": "Jabuke", "values": [64077,22405,44160,46340,63092,57298,57571,62991,57341,73924,89124,99676,37414,121738,96703,96182]}
@@ -21,10 +21,13 @@ var datacol=[
 ,{"type": "numeric", "name": "Masline", "values": [16215,19413,32955,9482,20613,36602,27530,34527,35955,32592,38001,31423,50945,34269,8840,28267]}
 ,{"type": "numeric", "name": "Okućnica", "values": [50943,41167,38121,44320,67813,51945,68773,82813,79360,71777,60756,45923,23698,26763,15105,16074]}
 ];
+//object data
 var data = { 
     nodes : [],
 	links : []
 };
+var nf=datacol.length-1;
+//save beggining values to data
 function setData(){
 var data = { 
     nodes : [],
@@ -34,7 +37,7 @@ var nodes1 = [];
 var nodes2 = [];
 var i,j,k;
 k=0;
-for(i=0;i<19;i++){
+for(i=0;i<nf;i++){
 	var jsonData = {};
 	var fruit=datacol[i+1]["name"];
 	var value=datacol[i+1]["values"][0];
@@ -44,13 +47,14 @@ for(i=0;i<19;i++){
 	jsonData["value"] = value;
 	nodes1.push(jsonData);	
 }
+//sort values descending
 nodes1.sort(function(a, b) { return b.value - a.value; });
-for(i=0;i<19;i++){
+for(i=0;i<nf;i++){
 	var jsonData = {};
 	var fruit=nodes1[i]["name"];
 	var value=nodes1[i]["value"];
 	jsonData["name"] = fruit;
-	jsonData["node"] = 19+i;
+	jsonData["node"] = nf+i;
 	jsonData["kind"] = "target";
 	jsonData["value"] = value;
 	jsonData["realvalue"] = value;
@@ -58,10 +62,10 @@ for(i=0;i<19;i++){
 	nodes2.push(jsonData);
 }
 data.nodes=nodes1.concat(nodes2);
-for(i=0;i<19;i++){
+for(i=0;i<nf;i++){
 	var jsonData = {};
 	var source=i;
-	var target=19+i;
+	var target=nf+i;
 	var value=data.nodes[i]["value"];
 	jsonData["source"] = source;
 	jsonData["target"] = target;
@@ -69,13 +73,11 @@ for(i=0;i<19;i++){
 	jsonData["kind"] = "links";
 	data.links.push(jsonData);
 }
-
-
 var json = JSON.stringify(data);
 console.log(data);
 return data;
 }
-
+//update values in data by year
 function updateYear(year){
 var data = { 
     nodes : [],
@@ -87,7 +89,7 @@ var i,j,k;
 k=0;
 while(year!=datacol[0]["values"][k])
 {k++;}
-for(i=0;i<19;i++){
+for(i=0;i<nf;i++){
 	var jsonData = {};
 	var fruit=datacol[i+1]["name"];
 	var value=datacol[i+1]["values"][k];
@@ -98,12 +100,12 @@ for(i=0;i<19;i++){
 	nodes1.push(jsonData);	
 }
 nodes1.sort(function(a, b) { return b.value - a.value; });
-for(i=0;i<19;i++){
+for(i=0;i<nf;i++){
 	var jsonData = {};
 	var fruit=nodes1[i]["name"];
 	var value=nodes1[i]["value"];
 	jsonData["name"] = fruit;
-	jsonData["node"] = 19+i;
+	jsonData["node"] = nf+i;
 	jsonData["kind"] = "target";
 	jsonData["value"] = value;
 	jsonData["realvalue"] = value;
@@ -111,10 +113,10 @@ for(i=0;i<19;i++){
 	nodes2.push(jsonData);
 }
 data.nodes=nodes1.concat(nodes2);
-for(i=0;i<19;i++){
+for(i=0;i<nf;i++){
 	var jsonData = {};
 	var source=i;
-	var target=19+i;
+	var target=nf+i;
 	var value=nodes1[i]["value"];
 	jsonData["source"] = source;
 	jsonData["target"] = target;
@@ -127,34 +129,37 @@ console.log(data);
 return data;
 }
 
+var ny=datacol[0]["values"].length;
+var nn=2*nf;
+//update values in data by product-fruit
  function updateByFruit(fruitid){
 	 k=1;
-while(data.nodes[fruitid-19]["name"]!=datacol[k]["name"])
+while(data.nodes[fruitid-nf]["name"]!=datacol[k]["name"])
 {k++;}	
-for(i=0;i<16;i++){
+for(i=0;i<ny;i++){
 	var jsonData = {};
 	var year=datacol[0]["values"][i];
 	var fruit=datacol[k]["name"];
 	var value=datacol[k]["values"][i];
 	jsonData["year"] = year;
 	jsonData["name"] = fruit+" - "+year;
-	jsonData["node"] = 38+i;
+	jsonData["node"] = nn+i;
 	jsonData["kind"] = "yearext";
 	jsonData["value"] = value;
 	data.nodes.push(jsonData);
 }
 var jsonData = {};
 jsonData["name"] = "fakenode";
-	jsonData["node"] = 54;
+	jsonData["node"] = nn+ny;
 	jsonData["kind"] = "yearext";
 	jsonData["value"] = 0;
 	data.nodes.push(jsonData);
-for(i=0;i<19;i++){
-if(i+19==fruitid){
-for(j=0;j<16;j++){
+for(i=0;i<nf;i++){
+if(i+nf==fruitid){
+for(j=0;j<ny;j++){
 	var jsonData = {};
-	var source=i+19;
-	var target=38+j;
+	var source=i+nf;
+	var target=nn+j;
 	var value=datacol[k]["values"][j];
 	jsonData["source"] = source;
 	jsonData["target"] = target;
@@ -165,8 +170,8 @@ for(j=0;j<16;j++){
 }
 else{
 	var jsonData = {};
-	var source=19+i;
-	var target=54;
+	var source=nf+i;
+	var target=nn+ny;
 	var value=datacol[i+1]["values"][0];
 	jsonData["source"] = source;
 	jsonData["target"] = target;
@@ -175,10 +180,10 @@ else{
 	data.links.push(jsonData);
 }
 }
-for(i=0;i<16;i++){
+for(i=0;i<ny;i++){
 	var jsonData = {};
-	var source=54;
-	var target=38+i;
+	var source=nn+ny;
+	var target=nn+i;
 	var value=datacol[k]["values"][i];
 	jsonData["source"] = source;
 	jsonData["target"] = target;
